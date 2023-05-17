@@ -1,0 +1,355 @@
+Q1. Given a linked list and a key ‘X‘ in, the task is to check if X is present in the linked list or not.
+Examples:
+14->21->11->30->10, X = 14
+Yes
+Explanation: 14 is present in the linked list.
+6->21->17->30->10->8, X = 13
+No
+
+class Node {
+    int data;
+    Node next;
+
+    Node(int data) {
+        this.data = data;
+        next = null;
+    }
+}
+
+class LinkedList {
+    Node head;
+
+    boolean searchKey(int key) {
+        Node current = head;
+        while (current != null) {
+            if (current.data == key) {
+                return true;
+            }
+            current = current.next;
+        }
+        return false;
+    }
+
+    public static void main(String[] args) {
+        LinkedList list = new LinkedList();
+
+        // Create the linked list
+        list.head = new Node(14);
+        Node second = new Node(21);
+        Node third = new Node(11);
+        Node fourth = new Node(30);
+        Node fifth = new Node(10);
+
+        list.head.next = second;
+        second.next = third;
+        third.next = fourth;
+        fourth.next = fifth;
+
+        int key = 14;
+        boolean isKeyPresent = list.searchKey(key);
+
+        if (isKeyPresent) {
+            System.out.println("Yes");
+        } else {
+            System.out.println("No");
+        }
+    }
+}
+=============================================================================================================================================
+Q2. Insert a node at the given position in a linked list. We are given a pointer to a node, and the
+new node is inserted after the given node.
+LL = 1 -> 2 -> 4 -> 5 -> 6 pointer = 2 value = 3.
+1 -> 2 -> 3 -> 4 -> 5 -> 6
+
+class Node {
+    int data;
+    Node next;
+
+    Node(int data) {
+        this.data = data;
+        next = null;
+    }
+}
+
+class LinkedList {
+    Node head;
+
+    void insertAfter(Node prevNode, int newValue) {
+        if (prevNode == null) {
+            System.out.println("Previous node cannot be null.");
+            return;
+        }
+
+        Node newNode = new Node(newValue);
+        newNode.next = prevNode.next;
+        prevNode.next = newNode;
+    }
+
+    void display() {
+        Node current = head;
+        while (current != null) {
+            System.out.print(current.data + " ");
+            current = current.next;
+        }
+        System.out.println();
+    }
+
+    public static void main(String[] args) {
+        LinkedList list = new LinkedList();
+
+        // Create the linked list
+        list.head = new Node(1);
+        Node second = new Node(2);
+        Node third = new Node(4);
+        Node fourth = new Node(5);
+        Node fifth = new Node(6);
+
+        list.head.next = second;
+        second.next = third;
+        third.next = fourth;
+        fourth.next = fifth;
+
+        int valueToInsert = 3;
+        Node pointer = second; // Node after which the new node will be inserted
+
+        System.out.print("Original linked list: ");
+        list.display();
+
+        // Insert the new node after the given node
+        list.insertAfter(pointer, valueToInsert);
+
+        System.out.print("Linked list after inserting " + valueToInsert + ": ");
+        list.display();
+    }
+}
+=============================================================================================================================================
+Q3. Given the head of a sorted linked list, delete all duplicates such that each element
+appears only once. Return the linked list sorted as well.
+
+class Node {
+    int data;
+    Node next;
+
+    Node(int data) {
+        this.data = data;
+        next = null;
+    }
+}
+
+class LinkedList {
+    Node head;
+
+    void deleteDuplicates() {
+        Node current = head;
+
+        while (current != null && current.next != null) {
+            if (current.data == current.next.data) {
+                current.next = current.next.next; // Skip duplicate nodes
+            } else {
+                current = current.next;
+            }
+        }
+    }
+
+    void display() {
+        Node current = head;
+        while (current != null) {
+            System.out.print(current.data + " ");
+            current = current.next;
+        }
+        System.out.println();
+    }
+
+    public static void main(String[] args) {
+        LinkedList list = new LinkedList();
+
+        // Create the sorted linked list with duplicates
+        list.head = new Node(1);
+        Node second = new Node(1);
+        Node third = new Node(2);
+        Node fourth = new Node(3);
+        Node fifth = new Node(3);
+
+        list.head.next = second;
+        second.next = third;
+        third.next = fourth;
+        fourth.next = fifth;
+
+        System.out.print("Original linked list: ");
+        list.display();
+
+        // Delete duplicates from the linked list
+        list.deleteDuplicates();
+
+        System.out.print("Linked list after deleting duplicates: ");
+        list.display();
+    }
+}
+==============================================================================================================================================
+
+Q4. Given the head of a singly linked list, return true if it is a palindrome or false otherwise.
+class Node {
+    int data;
+    Node next;
+
+    Node(int data) {
+        this.data = data;
+        next = null;
+    }
+}
+
+class LinkedList {
+    Node head;
+
+    boolean isPalindrome() {
+        if (head == null || head.next == null) {
+            return true; // An empty list or a single node is considered a palindrome
+        }
+
+        Node slow = head;
+        Node fast = head;
+        Node prev = null;
+
+        // Find the middle node of the linked list and reverse the first half
+        while (fast != null && fast.next != null) {
+            fast = fast.next.next;
+            Node nextNode = slow.next;
+            slow.next = prev;
+            prev = slow;
+            slow = nextNode;
+        }
+
+        // Handle odd number of nodes
+        if (fast != null) {
+            slow = slow.next;
+        }
+
+        // Compare the reversed first half with the second half
+        while (prev != null && slow != null) {
+            if (prev.data != slow.data) {
+                return false; // Values don't match, not a palindrome
+            }
+            prev = prev.next;
+            slow = slow.next;
+        }
+
+        return true; // All values matched, it is a palindrome
+    }
+
+    public static void main(String[] args) {
+        LinkedList list = new LinkedList();
+
+        // Create a linked list which is a palindrome
+        list.head = new Node(1);
+        Node second = new Node(2);
+        Node third = new Node(3);
+        Node fourth = new Node(2);
+        Node fifth = new Node(1);
+
+        list.head.next = second;
+        second.next = third;
+        third.next = fourth;
+        fourth.next = fifth;
+
+        boolean isPalindrome = list.isPalindrome();
+
+        if (isPalindrome) {
+            System.out.println("The linked list is a palindrome.");
+        } else {
+            System.out.println("The linked list is not a palindrome.");
+        }
+    }
+}
+=============================================================================================================================================
+Q5. Given two numbers represented by two lists, write a function that returns the sum list. The
+sum list is a list representation of the addition of two input numbers.
+
+class Node {
+    int data;
+    Node next;
+
+    Node(int data) {
+        this.data = data;
+        next = null;
+    }
+}
+
+class LinkedList {
+    Node head;
+
+    LinkedList addTwoNumbers(LinkedList list1, LinkedList list2) {
+        LinkedList sumList = new LinkedList();
+        Node dummy = new Node(0);
+        Node current = dummy;
+        int carry = 0;
+
+        Node p = list1.head;
+        Node q = list2.head;
+
+        while (p != null || q != null) {
+            int x = (p != null) ? p.data : 0;
+            int y = (q != null) ? q.data : 0;
+            int sum = x + y + carry;
+
+            carry = sum / 10;
+            current.next = new Node(sum % 10);
+            current = current.next;
+
+            if (p != null) {
+                p = p.next;
+            }
+            if (q != null) {
+                q = q.next;
+            }
+        }
+
+        if (carry > 0) {
+            current.next = new Node(carry);
+        }
+
+        sumList.head = dummy.next;
+        return sumList;
+    }
+
+    void display() {
+        Node current = head;
+        while (current != null) {
+            System.out.print(current.data + " ");
+            current = current.next;
+        }
+        System.out.println();
+    }
+
+    public static void main(String[] args) {
+        LinkedList list1 = new LinkedList();
+        LinkedList list2 = new LinkedList();
+
+        // Create the first linked list: 5->6->3
+        list1.head = new Node(5);
+        Node second1 = new Node(6);
+        Node third1 = new Node(3);
+
+        list1.head.next = second1;
+        second1.next = third1;
+
+        // Create the second linked list: 8->4->2
+        list2.head = new Node(8);
+        Node second2 = new Node(4);
+        Node third2 = new Node(2);
+
+        list2.head.next = second2;
+        second2.next = third2;
+
+        System.out.print("List 1: ");
+        list1.display();
+
+        System.out.print("List 2: ");
+        list2.display();
+
+        LinkedList sumList = new LinkedList().addTwoNumbers(list1, list2);
+
+        System.out.print("Resultant list: ");
+        sumList.display();
+    }
+}
+==============================================================================================================================================
