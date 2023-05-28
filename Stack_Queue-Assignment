@@ -1,0 +1,418 @@
+Q1. Given a rows x cols binary matrix filled with 0's and 1's, find the largest rectangle containing
+only 1's and return its area.
+public class LargestRectangleArea {
+    
+    public static int maximalRectangle(char[][] matrix) {
+        if (matrix == null || matrix.length == 0 || matrix[0].length == 0) {
+            return 0;
+        }
+        
+        int rows = matrix.length;
+        int cols = matrix[0].length;
+        
+        int[] heights = new int[cols];
+        int maxArea = 0;
+        
+        for (int i = 0; i < rows; i++) {
+            // Update the heights array based on the current row
+            for (int j = 0; j < cols; j++) {
+                if (matrix[i][j] == '1') {
+                    heights[j]++;
+                } else {
+                    heights[j] = 0;
+                }
+            }
+            
+            // Calculate the maximum area for the current row
+            maxArea = Math.max(maxArea, calculateArea(heights));
+        }
+        
+        return maxArea;
+    }
+    
+    private static int calculateArea(int[] heights) {
+        int maxArea = 0;
+        int n = heights.length;
+        
+        Stack<Integer> stack = new Stack<>();
+        
+        for (int i = 0; i <= n; i++) {
+            int height = (i == n) ? 0 : heights[i];
+            
+            if (stack.isEmpty() || height >= heights[stack.peek()]) {
+                stack.push(i);
+            } else {
+                int top = stack.pop();
+                maxArea = Math.max(maxArea, heights[top] * (stack.isEmpty() ? i : (i - stack.peek() - 1)));
+                i--;
+            }
+        }
+        
+        return maxArea;
+    }
+    
+    public static void main(String[] args) {
+        char[][] matrix = {
+            {'1', '0', '1', '0', '0'},
+            {'1', '0', '1', '1', '1'},
+            {'1', '1', '1', '1', '1'},
+            {'1', '0', '0', '1', '0'}
+        };
+        
+        int largestRectangleArea = maximalRectangle(matrix);
+        System.out.println("Largest rectangle area: " + largestRectangleArea);
+    }
+}
+============================================================================================================================================================================================
+Q2. Given an encoded string, return its decoded string. The encoding rule is: k[encoded_string],
+where the encoded_string inside the square brackets is being repeated exactly k times. Note
+that k is guaranteed to be a positive integer.
+You may assume that the input string is always valid; there are no extra white spaces, square
+brackets are well-formed, etc. Furthermore, you may assume that the original data does not
+contain any digits and that digits are only for those repeat numbers, k. For example, there will
+not be input like 3a or 2[4].
+import java.util.Stack;
+
+public class DecodeString {
+    public static String decodeString(String s) {
+        Stack<Integer> countStack = new Stack<>();
+        Stack<String> stringStack = new Stack<>();
+        String currentString = "";
+        int count = 0;
+        
+        for (char ch : s.toCharArray()) {
+            if (Character.isDigit(ch)) {
+                // Calculate the count
+                count = count * 10 + (ch - '0');
+            } else if (ch == '[') {
+                // Push the current count and string to the stacks
+                countStack.push(count);
+                stringStack.push(currentString);
+                
+                // Reset the count and current string
+                count = 0;
+                currentString = "";
+            } else if (ch == ']') {
+                // Retrieve the previous count and string from the stacks
+                StringBuilder sb = new StringBuilder(stringStack.pop());
+                int repeatCount = countStack.pop();
+                
+                // Repeat the current string
+                for (int i = 0; i < repeatCount; i++) {
+                    sb.append(currentString);
+                }
+                
+                // Update the current string
+                currentString = sb.toString();
+            } else {
+                // Append the character to the current string
+                currentString += ch;
+            }
+        }
+        
+        return currentString;
+    }
+    
+    public static void main(String[] args) {
+        String encodedString = "3[a]2[bc]";
+        String decodedString = decodeString(encodedString);
+        System.out.println("Decoded string: " + decodedString);
+    }
+}
+===========================================================================================================================================================================================
+Q3. You are keeping the scores for a baseball game with strange rules. At the beginning of the
+game, you start with an empty record.
+You are given a list of strings operations, where operations[i] is the ith operation you must apply
+to the record and is one of the following:
+An integer x.
+Record a new score of x.
+'+'.
+Record a new score that is the sum of the previous two scores.
+'D'.
+Record a new score that is the double of the previous score.
+'C'.
+Invalidate the previous score, removing it from the record.
+Return the sum of all the scores on the record after applying all the operations.
+import java.util.Stack;
+
+public class BaseballGame {
+    public static int calPoints(String[] operations) {
+        Stack<Integer> stack = new Stack<>();
+        int sum = 0;
+        
+        for (String operation : operations) {
+            if (operation.equals("+")) {
+                int top = stack.pop();
+                int newTop = top + stack.peek();
+                stack.push(top);
+                stack.push(newTop);
+                sum += newTop;
+            } else if (operation.equals("D")) {
+                int newScore = stack.peek() * 2;
+                stack.push(newScore);
+                sum += newScore;
+            } else if (operation.equals("C")) {
+                int removedScore = stack.pop();
+                sum -= removedScore;
+            } else {
+                int score = Integer.parseInt(operation);
+                stack.push(score);
+                sum += score;
+            }
+        }
+        
+        return sum;
+    }
+    
+    public static void main(String[] args) {
+        String[] operations = {"5", "2", "C", "D", "+"};
+        int totalScore = calPoints(operations);
+        System.out.println("Total score: " + totalScore);
+    }
+}
+===========================================================================================================================================================================================
+Q4. We are given an array of asteroids of integers representing asteroids in a row.For each
+asteroid, the absolute value represents its size, and the sign represents its direction (positive
+meaning right, negative meaning left). Each asteroid moves at the same speed.
+Find out the state of the asteroids after all collisions. If two asteroids meet, the smaller one will
+explode. If both are the same size, both will explode. Two asteroids moving in the same direction
+will never meet.
+import java.util.Stack;
+
+public class AsteroidCollision {
+    public static int[] asteroidCollision(int[] asteroids) {
+        Stack<Integer> stack = new Stack<>();
+        
+        for (int asteroid : asteroids) {
+            if (asteroid > 0) {
+                stack.push(asteroid);
+            } else {
+                while (!stack.isEmpty() && stack.peek() > 0 && stack.peek() < Math.abs(asteroid)) {
+                    stack.pop();
+                }
+                
+                if (stack.isEmpty() || stack.peek() < 0) {
+                    stack.push(asteroid);
+                } else if (stack.peek() == -asteroid) {
+                    stack.pop();
+                }
+            }
+        }
+        
+        int[] result = new int[stack.size()];
+        for (int i = stack.size() - 1; i >= 0; i--) {
+            result[i] = stack.pop();
+        }
+        
+        return result;
+    }
+    
+    public static void main(String[] args) {
+        int[] asteroids = {5, 10, -5};
+        int[] result = asteroidCollision(asteroids);
+        
+        System.out.print("State of asteroids after collisions: ");
+        for (int asteroid : result) {
+            System.out.print(asteroid + " ");
+        }
+    }
+}
+============================================================================================================================================================================================
+Q5. Given an array of integers temperatures represents the daily temperatures, return an array
+answer such that answer[i] is the number of days you have to wait after the ith day to get a
+warmer temperature. If there is no future day for which this is possible, keep answer[i] == 0
+instead.
+import java.util.Stack;
+
+public class DailyTemperatures {
+    public static int[] dailyTemperatures(int[] temperatures) {
+        int[] result = new int[temperatures.length];
+        Stack<Integer> stack = new Stack<>();
+        
+        for (int i = 0; i < temperatures.length; i++) {
+            while (!stack.isEmpty() && temperatures[i] > temperatures[stack.peek()]) {
+                int prevIndex = stack.pop();
+                result[prevIndex] = i - prevIndex;
+            }
+            
+            stack.push(i);
+        }
+        
+        return result;
+    }
+    
+    public static void main(String[] args) {
+        int[] temperatures = {73, 74, 75, 71, 69, 72, 76, 73};
+        int[] result = dailyTemperatures(temperatures);
+        
+        System.out.print("Number of days to wait for warmer temperature: ");
+        for (int days : result) {
+            System.out.print(days + " ");
+        }
+    }
+}
+===========================================================================================================================================================================================
+Q1. Implement a Map in java which takes the input and print the list in sorted order based on key.
+import java.util.Map;
+import java.util.TreeMap;
+
+public class SortedMapExample {
+    public static void main(String[] args) {
+        // Create a TreeMap
+        Map<Integer, String> map = new TreeMap<>();
+        
+        // Add key-value pairs to the map
+        map.put(5, "Rahul");
+        map.put(7, "Lakshman");
+        map.put(1, "Ram");
+        map.put(4, "Krrish");
+        map.put(2, "Lakshay");
+        
+        // Print the map in sorted order based on keys
+        System.out.println(map);
+    }
+}
+
+===========================================================================================================================================================================================
+Q2. Implement a Map in java which takes the input and print the list in sorted order based on value.
+Input: 5- Rahul, 7 Lakshman, 1 Ram, 4 Krrish, 2 Lakshay
+Output: {Krish=4,Lakshay=2,Lakshman=7,Rahul=5,Ram=1}
+import java.util.*;
+
+public class SortedMapByValueExample {
+    public static void main(String[] args) {
+        // Create a HashMap
+        Map<Integer, String> map = new HashMap<>();
+        
+        // Add key-value pairs to the map
+        map.put(5, "Rahul");
+        map.put(7, "Lakshman");
+        map.put(1, "Ram");
+        map.put(4, "Krrish");
+        map.put(2, "Lakshay");
+        
+        // Sort the map by value
+        List<Map.Entry<Integer, String>> sortedList = new ArrayList<>(map.entrySet());
+        sortedList.sort(Map.Entry.comparingByValue());
+        
+        // Create a new TreeMap to store the sorted map by value
+        Map<String, Integer> sortedMapByValue = new LinkedHashMap<>();
+        for (Map.Entry<Integer, String> entry : sortedList) {
+            sortedMapByValue.put(entry.getValue(), entry.getKey());
+        }
+        
+        // Print the map in sorted order based on value
+        System.out.println(sortedMapByValue);
+    }
+}
+
+===========================================================================================================================================================================================
+Q3.Detect if an Array contains a duplicate element. At Most 1 duplicate would be there.
+Input: 1,2,3,4
+Output: No
+Input: 1, 2, 3, 4, 1
+Output: Yes.
+import java.util.HashSet;
+
+public class DuplicateElementDetection {
+    public static boolean containsDuplicate(int[] nums) {
+        HashSet<Integer> set = new HashSet<>();
+        
+        for (int num : nums) {
+            if (set.contains(num)) {
+                return true;
+            }
+            set.add(num);
+        }
+        
+        return false;
+    }
+    
+    public static void main(String[] args) {
+        int[] arr1 = {1, 2, 3, 4};
+        boolean result1 = containsDuplicate(arr1);
+        System.out.println("Input: 1, 2, 3, 4");
+        System.out.println("Output: " + (result1 ? "Yes" : "No"));
+        
+        int[] arr2 = {1, 2, 3, 4, 1};
+        boolean result2 = containsDuplicate(arr2);
+        System.out.println("Input: 1, 2, 3, 4, 1");
+        System.out.println("Output: " + (result2 ? "Yes" : "No"));
+    }
+}
+
+===========================================================================================================================================================================================
+Q4. Given an array nums of size n, return the majority element.
+Input: 4,2,7,1,9
+Output: 9
+public class MajorityElement {
+    public static int majorityElement(int[] nums) {
+        int majority = nums[0];
+        int count = 1;
+        
+        for (int i = 1; i < nums.length; i++) {
+            if (count == 0) {
+                majority = nums[i];
+                count = 1;
+            } else if (nums[i] == majority) {
+                count++;
+            } else {
+                count--;
+            }
+        }
+        
+        return majority;
+    }
+    
+    public static void main(String[] args) {
+        int[] nums = {4, 2, 7, 1, 9};
+        int majority = majorityElement(nums);
+        System.out.println("Input: 4, 2, 7, 1, 9");
+        System.out.println("Output: " + majority);
+    }
+}
+
+============================================================================================================================================================================================
+Q5. Given two strings ransomNote and magazine, return true if ransomNote can be constructed by using the
+letters from magazine and false otherwise.
+Each letter in magazine can only be used once in ransomNote.
+Input: ransomNote = "a", magazine = "b"
+Output: false
+Input: ransomNote = "aa", magazine = "ab"
+Output: false
+public class RansomNote {
+    public static boolean canConstruct(String ransomNote, String magazine) {
+        int[] charCount = new int[26];
+        
+        // Count the occurrences of each letter in magazine
+        for (char ch : magazine.toCharArray()) {
+            charCount[ch - 'a']++;
+        }
+        
+        // Check if the letters in ransomNote can be constructed from magazine
+        for (char ch : ransomNote.toCharArray()) {
+            if (charCount[ch - 'a'] == 0) {
+                return false;
+            }
+            charCount[ch - 'a']--;
+        }
+        
+        return true;
+    }
+    
+    public static void main(String[] args) {
+        String ransomNote1 = "a";
+        String magazine1 = "b";
+        boolean result1 = canConstruct(ransomNote1, magazine1);
+        System.out.println("Input: ransomNote = \"" + ransomNote1 + "\", magazine = \"" + magazine1 + "\"");
+        System.out.println("Output: " + result1);
+        
+        String ransomNote2 = "aa";
+        String magazine2 = "ab";
+        boolean result2 = canConstruct(ransomNote2, magazine2);
+        System.out.println("Input: ransomNote = \"" + ransomNote2 + "\", magazine = \"" + magazine2 + "\"");
+        System.out.println("Output: " + result2);
+    }
+}
+
+
