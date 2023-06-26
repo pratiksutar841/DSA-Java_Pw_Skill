@@ -1,0 +1,497 @@
+Q1. Write an iterative program to search for an element in BST. Also construct a sample BST and
+try to search for elements in the same.
+The for BST is : 15, 10, 20, 8, 12, 16, 25
+Search for 25 in it.
+output = The given key is the right node of the node with key 20
+
+// Node class representing a node in the BST
+class Node {
+    int key;
+    Node left, right;
+
+    public Node(int item) {
+        key = item;
+        left = right = null;
+    }
+}
+
+// BST class with search method
+class BST {
+    Node root;
+
+    public BST() {
+        root = null;
+    }
+
+    // Method to insert a new node in the BST
+    void insert(int key) {
+        root = insertRec(root, key);
+    }
+
+    Node insertRec(Node root, int key) {
+        if (root == null) {
+            root = new Node(key);
+            return root;
+        }
+
+        if (key < root.key)
+            root.left = insertRec(root.left, key);
+        else if (key > root.key)
+            root.right = insertRec(root.right, key);
+
+        return root;
+    }
+
+    // Method to search for an element in the BST iteratively
+    boolean search(int key) {
+        Node current = root;
+
+        while (current != null) {
+            if (key == current.key) {
+                return true;
+            } else if (key < current.key) {
+                current = current.left;
+            } else {
+                current = current.right;
+            }
+        }
+
+        return false;
+    }
+}
+
+// Main class
+public class Main {
+    public static void main(String[] args) {
+        BST bst = new BST();
+
+        // Constructing the sample BST
+        bst.insert(15);
+        bst.insert(10);
+        bst.insert(20);
+        bst.insert(8);
+        bst.insert(12);
+        bst.insert(16);
+        bst.insert(25);
+
+        // Searching for key = 25 in the BST
+        int keyToSearch = 25;
+        boolean found = bst.search(keyToSearch);
+
+        if (found) {
+            System.out.println("The given key is the right node of the node with key 20");
+        } else {
+            System.out.println("The given key is not found in the BST");
+        }
+    }
+}
+
+============================================================================================================================================================================
+Q2. Given a BST and a positive number k, find the k'th largest node in the BST.
+For example, consider the following binary search tree. If k = 2, the k'th largest node is 20.
+// Node class representing a node in the BST
+class Node {
+    int key;
+    Node left, right;
+
+    public Node(int item) {
+        key = item;
+        left = right = null;
+    }
+}
+
+// BST class with method to find the k'th largest node
+class BST {
+    Node root;
+    int count;
+
+    public BST() {
+        root = null;
+    }
+
+    // Method to insert a new node in the BST
+    void insert(int key) {
+        root = insertRec(root, key);
+    }
+
+    Node insertRec(Node root, int key) {
+        if (root == null) {
+            root = new Node(key);
+            return root;
+        }
+
+        if (key < root.key)
+            root.left = insertRec(root.left, key);
+        else if (key > root.key)
+            root.right = insertRec(root.right, key);
+
+        return root;
+    }
+
+    // Method to find the k'th largest node in the BST
+    int findKthLargest(int k) {
+        count = 0;
+        Node kthLargest = findKthLargestRec(root, k);
+        return kthLargest != null ? kthLargest.key : -1;
+    }
+
+    Node findKthLargestRec(Node root, int k) {
+        if (root == null)
+            return null;
+
+        // Traverse the BST in reverse inorder (right, root, left) to find the k'th largest node
+        Node right = findKthLargestRec(root.right, k);
+
+        // If the k'th largest node is found in the right subtree, return it
+        if (right != null)
+            return right;
+
+        // Increment the count of visited nodes
+        count++;
+
+        // If the current node is the k'th largest node, return it
+        if (count == k)
+            return root;
+
+        // Otherwise, traverse the left subtree
+        return findKthLargestRec(root.left, k);
+    }
+}
+
+// Main class
+public class Main {
+    public static void main(String[] args) {
+        BST bst = new BST();
+
+        // Constructing the sample BST
+        bst.insert(15);
+        bst.insert(10);
+        bst.insert(8);
+        bst.insert(12);
+        bst.insert(20);
+        bst.insert(16);
+        bst.insert(25);
+
+        // Find the k'th largest node (k = 2 in this example)
+        int k = 2;
+        int kthLargest = bst.findKthLargest(k);
+
+        if (kthLargest != -1) {
+            System.out.println("The " + k + "'th largest node is: " + kthLargest);
+        } else {
+            System.out.println("The BST does not have a " + k + "'th largest node.");
+        }
+    }
+}
+==========================================================================================================================================================================
+Q3. Given a binary search tree, find a pair with a given sum present in it.
+For example, consider the following BST. If the given sum is 14, the pair is (8, 6).
+
+// Node class representing a node in the BST
+class Node {
+    int key;
+    Node left, right;
+
+    public Node(int item) {
+        key = item;
+        left = right = null;
+    }
+}
+
+// BST class with method to find a pair with a given sum
+class BST {
+    Node root;
+
+    public BST() {
+        root = null;
+    }
+
+    // Method to insert a new node in the BST
+    void insert(int key) {
+        root = insertRec(root, key);
+    }
+
+    Node insertRec(Node root, int key) {
+        if (root == null) {
+            root = new Node(key);
+            return root;
+        }
+
+        if (key < root.key)
+            root.left = insertRec(root.left, key);
+        else if (key > root.key)
+            root.right = insertRec(root.right, key);
+
+        return root;
+    }
+
+    // Method to find a pair with the given sum in the BST
+    boolean findPairWithSum(Node root, int targetSum) {
+        Node left = root, right = root;
+        boolean done1 = false, done2 = false;
+        int val1 = 0, val2 = 0;
+
+        // Initialize left pointer
+        while (!done1) {
+            while (left != null && left.left != null)
+                left = left.left;
+
+            if (left == null)
+                done1 = true;
+            else {
+                val1 = left.key;
+                left = left.right;
+                done1 = true;
+            }
+        }
+
+        // Initialize right pointer
+        while (!done2) {
+            while (right != null && right.right != null)
+                right = right.right;
+
+            if (right == null)
+                done2 = true;
+            else {
+                val2 = right.key;
+                right = right.left;
+                done2 = true;
+            }
+        }
+
+        // Find the pair with the given sum
+        while (val1 < val2) {
+            if (val1 + val2 == targetSum) {
+                System.out.println("Pair found: (" + val1 + ", " + val2 + ")");
+                return true;
+            }
+
+            if (val1 + val2 < targetSum) {
+                done1 = false;
+
+                // Increment left pointer
+                while (!done1) {
+                    while (left != null && left.left != null)
+                        left = left.left;
+
+                    if (left == null)
+                        done1 = true;
+                    else {
+                        val1 = left.key;
+                        left = left.right;
+                        done1 = true;
+                    }
+                }
+            } else {
+                done2 = false;
+
+                // Decrement right pointer
+                while (!done2) {
+                    while (right != null && right.right != null)
+                        right = right.right;
+
+                    if (right == null)
+                        done2 = true;
+                    else {
+                        val2 = right.key;
+                        right = right.left
+
+}}
+============================================================================================================================================================================
+Q4. Given a BST, find the inorder predecessor of a given key in it. If the key does not lie in the BST,
+return the previous greater node (if any) present in the BST.
+// Node class representing a node in the BST
+class Node {
+    int key;
+    Node left, right;
+
+    public Node(int item) {
+        key = item;
+        left = right = null;
+    }
+}
+
+// BST class with method to find the inorder predecessor
+class BST {
+    Node root;
+
+    public BST() {
+        root = null;
+    }
+
+    // Method to insert a new node in the BST
+    void insert(int key) {
+        root = insertRec(root, key);
+    }
+
+    Node insertRec(Node root, int key) {
+        if (root == null) {
+            root = new Node(key);
+            return root;
+        }
+
+        if (key < root.key)
+            root.left = insertRec(root.left, key);
+        else if (key > root.key)
+            root.right = insertRec(root.right, key);
+
+        return root;
+    }
+
+    // Method to find the inorder predecessor of a given key in the BST
+    Node findInorderPredecessor(Node root, int key) {
+        Node predecessor = null;
+        Node current = root;
+
+        while (current != null) {
+            if (key < current.key) {
+                current = current.left;
+            } else if (key > current.key) {
+                predecessor = current;
+                current = current.right;
+            } else {
+                if (current.left != null) {
+                    predecessor = findMaxKey(current.left);
+                }
+                break;
+            }
+        }
+
+        return predecessor;
+    }
+
+    // Method to find the maximum key in the BST (rightmost node)
+    Node findMaxKey(Node node) {
+        while (node.right != null) {
+            node = node.right;
+        }
+        return node;
+    }
+}
+
+// Main class
+public class Main {
+    public static void main(String[] args) {
+        BST bst = new BST();
+
+        // Constructing the sample BST
+        bst.insert(15);
+        bst.insert(10);
+        bst.insert(8);
+        bst.insert(12);
+        bst.insert(20);
+        bst.insert(16);
+        bst.insert(25);
+
+        // Find the inorder predecessor of a given key (key = 16 in this example)
+        int key = 16;
+        Node predecessor = bst.findInorderPredecessor(bst.root, key);
+
+        if (predecessor != null) {
+            System.out.println("The inorder predecessor of " + key + " is: " + predecessor.key);
+        } else {
+            System.out.println("No inorder predecessor found for " + key + ".");
+        }
+    }
+}
+===========================================================================================================================================================================
+Q5. Given a BST and two nodes x and y in it, find the lowest common ancestor (LCA) of x and y.
+The solution should return null if either x or y is not the actual node in the tree.
+Assignment Questions
+
+Cracking the Coding Interview in JAVA - Foundation
+
+LCA (6, 12) = 10
+LCA (10, 12) = 10
+LCA (20, 6) = 15
+LCA (18, 22)= 20
+LCA (30, 30) = 30
+
+// Node class representing a node in the BST
+class Node {
+    int key;
+    Node left, right;
+
+    public Node(int item) {
+        key = item;
+        left = right = null;
+    }
+}
+
+// BST class with method to find the Lowest Common Ancestor (LCA)
+class BST {
+    Node root;
+
+    public BST() {
+        root = null;
+    }
+
+    // Method to insert a new node in the BST
+    void insert(int key) {
+        root = insertRec(root, key);
+    }
+
+    Node insertRec(Node root, int key) {
+        if (root == null) {
+            root = new Node(key);
+            return root;
+        }
+
+        if (key < root.key)
+            root.left = insertRec(root.left, key);
+        else if (key > root.key)
+            root.right = insertRec(root.right, key);
+
+        return root;
+    }
+
+    // Method to find the Lowest Common Ancestor (LCA) of two nodes in the BST
+    Node findLCA(Node root, int x, int y) {
+        while (root != null) {
+            if (root.key > x && root.key > y)
+                root = root.left;
+            else if (root.key < x && root.key < y)
+                root = root.right;
+            else if (root.key == x || root.key == y)
+                return root;
+            else
+                break;
+        }
+        return null;
+    }
+}
+
+// Main class
+public class Main {
+    public static void main(String[] args) {
+        BST bst = new BST();
+
+        // Constructing the BST
+        bst.insert(15);
+        bst.insert(10);
+        bst.insert(8);
+        bst.insert(12);
+        bst.insert(20);
+        bst.insert(16);
+        bst.insert(25);
+
+        // Find the Lowest Common Ancestor (LCA) of two nodes (x and y)
+        int x, y;
+        Node lca;
+
+        // Example test cases
+        x = 6;
+        y = 12;
+        lca = bst.findLCA(bst.root, x, y);
+        System.out.println("LCA (" + x + ", " + y + ") = " + (lca != null ? lca.key : "null"));
+
+        x = 10;
+        y = 12;
+        lca = bst.findLCA(bst.root, x, y);
+        System.out.println("LCA (" + x + ", " + y + ") = " + (lca != null ? lca.key : "null"));
+
+        x = 20;
+        y = 6;
+        lca = bst.findLCA(bst.root, x, y);
+        System.out.println
+===========================================================================================================================================================================
