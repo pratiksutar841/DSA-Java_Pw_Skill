@@ -1,0 +1,580 @@
+Q1. Given an integer array, find the kth largest element using priority queue.
+Input 1 : arr[] = {1,2,3,5,2,6,9} k = 3
+Output 1: 5
+Input 2 : arr[] = {1,7,8,5,2,6,9} k = 6
+Output 2: 2
+
+import java.util.PriorityQueue;
+
+public class KthLargestElement {
+    public static int findKthLargest(int[] arr, int k) {
+        // Create a min heap (priority queue)
+        PriorityQueue<Integer> minHeap = new PriorityQueue<>();
+
+        // Add elements to the min heap
+        for (int num : arr) {
+            minHeap.offer(num);
+
+            // If the min heap size exceeds k, remove the smallest element
+            if (minHeap.size() > k) {
+                minHeap.poll();
+            }
+        }
+
+        // The top element of the min heap will be the kth largest element
+        return minHeap.peek();
+    }
+
+    public static void main(String[] args) {
+        int[] arr1 = {1, 2, 3, 5, 2, 6, 9};
+        int k1 = 3;
+        System.out.println("Input 1: arr = {1, 2, 3, 5, 2, 6, 9}, k = 3");
+        System.out.println("Output 1: " + findKthLargest(arr1, k1));
+
+        int[] arr2 = {1, 7, 8, 5, 2, 6, 9};
+        int k2 = 6;
+        System.out.println("Input 2: arr = {1, 7, 8, 5, 2, 6, 9}, k = 6");
+        System.out.println("Output 2: " + findKthLargest(arr2, k2));
+    }
+}
+=============================================================================================================================================================================
+Q2. Given n ropes of different lengths, connect them into a single rope with minimum cost. Assume that the
+cost to connect two ropes is the same as the sum of their lengths.
+For example,
+Input: [5, 4, 2, 8]
+Output: The minimum cost is 36
+[5, 4, 2, 8] –> First, connect ropes of lengths 4 and 2 that will cost 6.
+[5, 6, 8] –> Next, connect ropes of lengths 5 and 6 that will cost 11.
+[11, 8] –> Finally, connect the remaining two ropes that will cost 19.
+Therefore, the total cost for connecting all ropes is 6 + 11 + 19 = 36.
+
+import java.util.PriorityQueue;
+
+public class MinCostRopeConnection {
+    public static int connectRopes(int[] ropes) {
+        // Create a min heap (priority queue)
+        PriorityQueue<Integer> minHeap = new PriorityQueue<>();
+
+        // Add all the ropes to the min heap
+        for (int rope : ropes) {
+            minHeap.offer(rope);
+        }
+
+        int totalCost = 0;
+
+        // Keep merging the smallest ropes until only one rope is left
+        while (minHeap.size() > 1) {
+            int firstRope = minHeap.poll();
+            int secondRope = minHeap.poll();
+
+            int mergedRope = firstRope + secondRope;
+            totalCost += mergedRope;
+
+            minHeap.offer(mergedRope);
+        }
+
+        return totalCost;
+    }
+
+    public static void main(String[] args) {
+        int[] ropes = {5, 4, 2, 8};
+        int minCost = connectRopes(ropes);
+        System.out.println("The minimum cost is: " + minCost);
+    }
+}
+
+
+=============================================================================================================================================================================
+Q3. Given an array of string ‘words’ and an integer k, return the k most frequent strings. Return the answer
+sorted by the frequency from highest to lowest. Sort the words with the same frequency by their
+lexicographical order.
+Example 1:
+Input: words = ["i","love","leetcode","i","love","coding"], k = 2
+Output: ["i","love"]
+Explanation: "i" and "love" are the two most frequent words.
+Note that "i" comes before "love" due to a lower alphabetical order.
+Example 2:
+Input: words = ["the","day","is","sunny","the","the","the","sunny","is","is"], k = 4
+Output: ["the","is","sunny","day"]
+Explanation: "the", "is", "sunny" and "day" are the four most frequent words, with the number of occurrences
+being 4, 3, 2 and 1 respectively.
+
+import java.util.*;
+
+public class TopKFrequentWords {
+    public static List<String> topKFrequent(String[] words, int k) {
+        // Create a HashMap to store the frequency of each word
+        Map<String, Integer> frequencyMap = new HashMap<>();
+
+        // Populate the frequency map
+        for (String word : words) {
+            frequencyMap.put(word, frequencyMap.getOrDefault(word, 0) + 1);
+        }
+
+        // Create a PriorityQueue to store the k most frequent words
+        PriorityQueue<String> pq = new PriorityQueue<>(new WordComparator(frequencyMap));
+
+        // Add words to the PriorityQueue
+        for (String word : frequencyMap.keySet()) {
+            pq.offer(word);
+            if (pq.size() > k) {
+                pq.poll();
+            }
+        }
+
+        // Create a result list to store the k most frequent words
+        List<String> result = new ArrayList<>();
+
+        // Add words from the PriorityQueue to the result list
+        while (!pq.isEmpty()) {
+            result.add(pq.poll());
+        }
+
+        // Reverse the result list to have the words sorted by frequency from highest to lowest
+        Collections.reverse(result);
+
+        return result;
+    }
+
+    // Comparator class to compare words based on their frequency and lexicographical order
+    static class WordComparator implements Comparator<String> {
+        Map<String, Integer> frequencyMap;
+
+        WordComparator(Map<String, Integer> frequencyMap) {
+            this.frequencyMap = frequencyMap;
+        }
+
+        @Override
+        public int compare(String word1, String word2) {
+            int freq1 = frequencyMap.get(word1);
+            int freq2 = frequencyMap.get(word2);
+
+            // If frequencies are equal, compare lexicographically
+            if (freq1 == freq2) {
+                return word1.compareTo(word2);
+            }
+
+            // Compare based on frequencies (in reverse order)
+            return freq2 - freq1;
+        }
+    }
+
+    public static void main(String[] args) {
+        String[] words1 = {"i", "love", "leetcode", "i", "love", "coding"};
+        int k1 = 2;
+        List<String> result1 = topKFrequent(words1, k1);
+        System.out.println("Input 1: words = [\"i\", \"love\", \"leetcode\", \"i\", \"love\", \"coding\"], k = 2");
+        System.out.println("Output 1: " + result1);
+
+        String[] words2 = {"the", "day", "is", "sunny", "the", "the", "the", "sunny", "is", "is"};
+        int k2 = 4;
+        List<String> result2 = topKFrequent(words2, k2);
+        System.out.println("Input 2: words = [\"the\", \"day\", \"is\", \"sunny\", \"the\", \"the\", \"the\", \"sunny\", \"is\", \"is\"], k = 4");
+        System.out.println("Output 2: " + result2);
+    }
+}
+
+
+============================================================================================================================================================================
+
+
+Q4. You are given an array of integer stones where stones[i] is the weight of the ith stone. We are playing a
+game with the stones. On each turn, we choose the heaviest two stones and smash them together. Suppose
+the heaviest two stones have weights x and y with x <= y. The result of this smash is:
+If x == y, both stones are destroyed, and
+If x != y, the stone of weight x is destroyed, and the stone of weight y has new weight y - x.
+At the end of the game, there is at most one stone left.
+Return the weight of the last remaining stone. If there are no stones left, return 0.
+
+
+
+Example 1:
+Input: stones = [2,7,4,1,8,1]
+Output: 1
+Explanation:
+We combine 7 and 8 to get 1 so the array converts to [2,4,1,1,1] then,
+we combine 2 and 4 to get 2 so the array converts to [2,1,1,1] then,
+we combine 2 and 1 to get 1 so the array converts to [1,1,1] then,
+we combine 1 and 1 to get 0 so the array converts to [1] then that's the value of the last stone.
+Example 2:
+Input: stones = [1]
+Output: 1
+
+import java.util.PriorityQueue;
+
+public class LastStoneWeight {
+    public static int lastStoneWeight(int[] stones) {
+        // Create a max heap (priority queue)
+        PriorityQueue<Integer> maxHeap = new PriorityQueue<>((a, b) -> b - a);
+
+        // Add stones to the max heap
+        for (int stone : stones) {
+            maxHeap.offer(stone);
+        }
+
+        // Smash the stones until only one stone is left
+        while (maxHeap.size() > 1) {
+            int stone1 = maxHeap.poll();
+            int stone2 = maxHeap.poll();
+
+            if (stone1 != stone2) {
+                maxHeap.offer(stone1 - stone2);
+            }
+        }
+
+        // Return the weight of the last remaining stone (or 0 if no stone is left)
+        return maxHeap.isEmpty() ? 0 : maxHeap.peek();
+    }
+
+    public static void main(String[] args) {
+        int[] stones1 = {2, 7, 4, 1, 8, 1};
+        int lastWeight1 = lastStoneWeight(stones1);
+        System.out.println("Input 1: stones = [2, 7, 4, 1, 8, 1]");
+        System.out.println("Output 1: " + lastWeight1);
+
+        int[] stones2 = {1};
+        int lastWeight2 = lastStoneWeight(stones2);
+        System.out.println("Input 2: stones = [1]");
+        System.out.println("Output 2: " + lastWeight2);
+    }
+}
+============================================================================================================================================================================
+                                                                Priority Queues Questions
+
+Q1. Given a string s, rearrange the characters of s so that any two adjacent characters are not the same.
+Return any possible rearrangement of s or return "" if not possible.
+Example 1:
+Input: s = "aab"
+Output: "aba"
+Example 2:
+Input: s = "aaab"
+Output: ""
+
+import java.util.*;
+
+public class RearrangeString {
+    public static String rearrangeString(String s) {
+        // Create a character-frequency map
+        Map<Character, Integer> frequencyMap = new HashMap<>();
+        for (char c : s.toCharArray()) {
+            frequencyMap.put(c, frequencyMap.getOrDefault(c, 0) + 1);
+        }
+
+        // Create a max heap (priority queue) to store characters based on their frequencies
+        PriorityQueue<Character> maxHeap = new PriorityQueue<>((a, b) -> frequencyMap.get(b) - frequencyMap.get(a));
+        maxHeap.addAll(frequencyMap.keySet());
+
+        // Create a string builder to build the rearranged string
+        StringBuilder sb = new StringBuilder();
+
+        // Process the characters from the max heap
+        while (!maxHeap.isEmpty()) {
+            char curr = maxHeap.poll();
+
+            // If the previous character is the same as the current one, we need to choose a different character
+            if (sb.length() > 0 && sb.charAt(sb.length() - 1) == curr) {
+                // If there are no more characters available, it's not possible to rearrange the string
+                if (maxHeap.isEmpty()) {
+                    return "";
+                }
+
+                // Choose the next character from the max heap
+                char next = maxHeap.poll();
+
+                // Add the next character to the string builder and reinsert the current character back into the max heap
+                sb.append(next);
+                frequencyMap.put(curr, frequencyMap.get(curr) - 1);
+                if (frequencyMap.get(curr) > 0) {
+                    maxHeap.offer(curr);
+                }
+
+                // Reinsert the next character into the max heap
+                frequencyMap.put(next, frequencyMap.get(next) - 1);
+                if (frequencyMap.get(next) > 0) {
+                    maxHeap.offer(next);
+                }
+            } else {
+                // Add the current character to the string builder and update its frequency
+                sb.append(curr);
+                frequencyMap.put(curr, frequencyMap.get(curr) - 1);
+
+                // If the frequency of the current character is greater than 0, reinsert it into the max heap
+                if (frequencyMap.get(curr) > 0) {
+                    maxHeap.offer(curr);
+                }
+            }
+        }
+
+        return sb.toString();
+    }
+
+    public static void main(String[] args) {
+        String s1 = "aab";
+        System.out.println("Input 1: s = \"aab\"");
+        System.out.println("Output 1: " + rearrangeString(s1));
+
+        String s2 = "aaab";
+        System.out.println("Input 2: s = \"aaab\"");
+        System.out.println("Output 2: " + rearrangeString(s2));
+    }
+}
+===========================================================================================================================================================================
+Q2. You are given two integer arrays nums1 and nums2 sorted in ascending order and an integer k.
+Define a pair (u, v) which consists of one element from the first array and one element from the second
+array.
+Return the k pairs (u1, v1), (u2, v2), ..., (uk, vk) with the smallest sums.
+Example 1:
+Input: nums1 = [1,7,11], nums2 = [2,4,6], k = 3
+Output: [[1,2],[1,4],[1,6]]
+Explanation: The first 3 pairs are returned from the sequence: [1,2],[1,4],[1,6],[7,2],[7,4],[11,2],[7,6],[11,4],[11,6]
+Example 2:
+Input: nums1 = [1,1,2], nums2 = [1,2,3], k = 2
+Output: [[1,1],[1,1]]
+Explanation: The first 2 pairs are returned from the sequence: [1,1],[1,1],[1,2],[2,1],[1,2],[2,2],[1,3],[1,3],[2,3]
+Example 3:
+Input: nums1 = [1,2], nums2 = [3], k = 3
+Output: [[1,3],[2,3]]
+Explanation: All possible pairs are returned from the sequence: [1,3],[2,3]
+
+import java.util.*;
+
+public class KSmallestPairs {
+    public static List<List<Integer>> kSmallestPairs(int[] nums1, int[] nums2, int k) {
+        // Create a min heap (priority queue) to store pairs based on their sums
+        PriorityQueue<List<Integer>> minHeap = new PriorityQueue<>((a, b) -> (a.get(0) + a.get(1)) - (b.get(0) + b.get(1)));
+
+        // Add pairs to the min heap
+        for (int num1 : nums1) {
+            for (int num2 : nums2) {
+                List<Integer> pair = Arrays.asList(num1, num2);
+                minHeap.offer(pair);
+
+                // If the size of the min heap exceeds k, remove the pair with the largest sum
+                if (minHeap.size() > k) {
+                    minHeap.poll();
+                }
+            }
+        }
+
+        // Create a list to store the k smallest pairs
+        List<List<Integer>> result = new ArrayList<>(minHeap);
+
+        return result;
+    }
+
+    public static void main(String[] args) {
+        int[] nums1 = {1, 7, 11};
+        int[] nums2 = {2, 4, 6};
+        int k = 3;
+        List<List<Integer>> result1 = kSmallestPairs(nums1, nums2, k);
+        System.out.println("Input 1: nums1 = [1, 7, 11], nums2 = [2, 4, 6], k = 3");
+        System.out.println("Output 1: " + result1);
+
+        int[] nums3 = {1, 1, 2};
+        int[] nums4 = {1, 2, 3};
+        k = 2;
+        List<List<Integer>> result2 = kSmallestPairs(nums3, nums4, k);
+        System.out.println("Input 2: nums1 = [1, 1, 2], nums2 = [1, 2, 3], k = 2");
+        System.out.println("Output 2: " + result2);
+
+        int[] nums5 = {1, 2};
+        int[] nums6 = {3};
+        k = 3;
+        List<List<Integer>> result3 = kSmallestPairs(nums5, nums6, k);
+        System.out.println("Input 3: nums1 = [1, 2], nums2 = [3], k = 3");
+        System.out.println("Output 3: " + result3);
+    }
+}
+============================================================================================================================================================================
+Q3. You are playing a solitaire game with three piles of stones of sizes a​, b,​ and c​ respectively. Each turn you
+choose two different non-empty piles, take one stone from each, and add 1 point to your score. The game
+stops when there are fewer than two non-empty piles (meaning there are no more available moves).
+Given three integers a​, b,​ and c​, return the maximum score you can get.
+Example 1:
+Input: a = 2, b = 4, c = 6
+Output: 6
+Explanation: The starting state is (2, 4, 6). One optimal set of moves is:
+- Take from 1st and 3rd piles, state is now (1, 4, 5)
+- Take from 1st and 3rd piles, state is now (0, 4, 4)
+- Take from 2nd and 3rd piles, state is now (0, 3, 3)
+- Take from 2nd and 3rd piles, state is now (0, 2, 2)
+
+Take from 2nd and 3rd piles, state is now (0, 1, 1)
+- Take from 2nd and 3rd piles, state is now (0, 0, 0)
+There are fewer than two non-empty piles, so the game ends. Total: 6 points.
+Example 2:
+Input: a = 4, b = 4, c = 6
+Output: 7
+Explanation: The starting state is (4, 4, 6). One optimal set of moves is:
+- Take from 1st and 2nd piles, state is now (3, 3, 6)
+- Take from 1st and 3rd piles, state is now (2, 3, 5)
+- Take from 1st and 3rd piles, state is now (1, 3, 4)
+- Take from 1st and 3rd piles, state is now (0, 3, 3)
+- Take from 2nd and 3rd piles, state is now (0, 2, 2)
+- Take from 2nd and 3rd piles, state is now (0, 1, 1)
+- Take from 2nd and 3rd piles, state is now (0, 0, 0)
+There are fewer than two non-empty piles, so the game ends. Total: 7 points.
+
+public class SolitaireGame {
+    public static int maximumScore(int a, int b, int c) {
+        int[] piles = {a, b, c};
+        Arrays.sort(piles); // Sort the piles in ascending order
+
+        int score = 0;
+
+        while (piles[1] > 0) {
+            piles[2]--; // Take one stone from the largest pile
+            piles[1]--; // Take one stone from the second largest pile
+            score++; // Increment the score
+
+            Arrays.sort(piles); // Sort the piles again
+        }
+
+        return score;
+    }
+
+    public static void main(String[] args) {
+        int a1 = 2, b1 = 4, c1 = 6;
+        System.out.println("Input 1: a = 2, b = 4, c = 6");
+        System.out.println("Output 1: " + maximumScore(a1, b1, c1));
+
+        int a2 = 4, b2 = 4, c2 = 6;
+        System.out.println("Input 2: a = 4, b = 4, c = 6");
+        System.out.println("Output 2: " + maximumScore(a2, b2, c2));
+    }
+}
+
+===========================================================================================================================================================================
+Q4. You are given an m x n matrix mat that has its rows sorted in non-decreasing order and an integer k.
+You are allowed to choose exactly one element from each row to form an array.
+Return the kth smallest array sum among all possible arrays.
+Example 1:
+Input: mat = [[1,3,11],[2,4,6]], k = 5
+Output: 7
+Explanation: Choosing one element from each row, the first k smallest sum are:
+[1,2], [1,4], [3,2], [3,4], [1,6]. Where the 5th sum is 7.
+Example 2:
+Input: mat = [[1,3,11],[2,4,6]], k = 9
+Output: 17
+Example 3:
+Input: mat = [[1,10,10],[1,4,5],[2,3,6]], k = 7
+Output: 9
+Explanation: Choosing one element from each row, the first k smallest sum are:
+[1,1,2], [1,1,3], [1,4,2], [1,4,3], [1,1,6], [1,5,2], [1,5,3]. Where the 7th sum is 9.
+
+import java.util.Arrays;
+
+public class KthSmallestSum {
+    public static int kthSmallestSum(int[][] mat, int k) {
+        int rows = mat.length;
+        int cols = mat[0].length;
+
+        int left = 0;
+        int right = 0;
+        for (int i = 0; i < rows; i++) {
+            left += mat[i][0];
+            right += mat[i][cols - 1];
+        }
+
+        int result = -1;
+        while (left < right) {
+            int mid = left + (right - left) / 2;
+            int count = countArrays(mat, mid, 0, k);
+            if (count < k) {
+                left = mid + 1;
+            } else {
+                result = mid;
+                right = mid;
+            }
+        }
+
+        return result;
+    }
+
+    private static int countArrays(int[][] mat, int targetSum, int rowIndex, int k) {
+        if (rowIndex == mat.length) {
+            return 1;
+        }
+
+        int count = 0;
+        for (int i = 0; i < mat[rowIndex].length; i++) {
+            if (mat[rowIndex][i] > targetSum) {
+                break;
+            }
+            count += countArrays(mat, targetSum - mat[rowIndex][i], rowIndex + 1, k - count);
+            if (count >= k) {
+                break;
+            }
+        }
+
+        return count;
+    }
+
+    public static void main(String[] args) {
+        int[][] mat1 = {{1, 3, 11}, {2, 4, 6}};
+        int k1 = 5;
+        System.out.println("Input 1: mat = [[1,3,11],[2,4,6]], k = 5");
+        System.out.println("Output 1: " + kthSmallestSum(mat1, k1));
+
+        int[][] mat2 = {{1, 3, 11}, {2, 4, 6}};
+        int k2 = 9;
+        System.out.println("Input 2: mat = [[1,3,11],[2,4,6]], k = 9");
+        System.out.println("Output 2: " + kthSmallestSum(mat2, k2));
+
+        int[][] mat3 = {{1, 10, 10}, {1, 4, 5}, {2, 3, 6}};
+        int k3 = 7;
+}
+===========================================================================================================================================================================
+
+Q5. Given that integers are read from a data stream. Find the median of elements read so for in an efficient
+way. For simplicity assume, there are no duplicates. For example, let us consider the streams 5, 15, 1, 3 ...
+After reading 1st element of stream - 5 -> median - 5
+After reading 2nd element of stream - 5, 15 -> median - 10
+After reading 3rd element of stream - 5, 15, 1 -> median - 5
+After reading the 4th element of stream - 5, 15, 1, 3 -> median - 4, so on.
+
+import java.util.PriorityQueue;
+
+public class MedianFinder {
+    private PriorityQueue<Integer> maxHeap;
+    private PriorityQueue<Integer> minHeap;
+
+    public MedianFinder() {
+        maxHeap = new PriorityQueue<>((a, b) -> b - a);
+        minHeap = new PriorityQueue<>();
+    }
+
+    public void addNum(int num) {
+        if (maxHeap.isEmpty() || num <= maxHeap.peek()) {
+            maxHeap.offer(num);
+        } else {
+            minHeap.offer(num);
+        }
+
+        // Balance the heaps
+        if (maxHeap.size() > minHeap.size() + 1) {
+            minHeap.offer(maxHeap.poll());
+        } else if (minHeap.size() > maxHeap.size()) {
+            maxHeap.offer(minHeap.poll());
+        }
+    }
+
+    public double findMedian() {
+        if (maxHeap.size() == minHeap.size()) {
+            return (maxHeap.peek() + minHeap.peek()) / 2.0;
+        } else {
+            return maxHeap.peek();
+        }
+    }
+
+    public static void main(String[] args) {
+        MedianFinder finder = new MedianFinder();
+        int[] stream = {5, 15, 1, 3};
+
+        for (int num : stream) {
+            finder.addNum(num);
+            System.out.println("After reading " + num + " -> median: " + finder.findMedian());
+        }
+    }
+}
+============================================================================================================================================================================
