@@ -1,0 +1,443 @@
+                                                Dynammic Programming-1
+                                                 Assignment Questions
+Q1. There are n stairs, a person standing at the bottom wants to reach the top. The person can
+climb either 1,2,3...m stairs at a time where m is a user given integer. Count the number of ways
+the person can reach the top.
+input : n = 5 , m = 3
+out : 7
+public class Staircase {
+
+    public static int countWays(int n, int m) {
+        int[] dp = new int[n + 1];
+        dp[0] = 1;
+        
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= m && j <= i; j++) {
+                dp[i] += dp[i - j];
+            }
+        }
+        
+        return dp[n];
+    }
+    
+    public static void main(String[] args) {
+        int n = 5;
+        int m = 3;
+        int ways = countWays(n, m);
+        System.out.println("Number of ways to reach the top: " + ways);
+    }
+}
+===================================================================================================================================================
+Q2. The Tribonacci sequence Tn is defined as follows:
+T0 = 0, T1 = 1, T2 = 1, and Tn+3 = Tn + Tn+1 + Tn+2 for n >= 0.
+Given n, return the value of nth tribonacci number.
+Example 1:
+input:n = 4
+output: 4
+Explanation:
+T_3 = 0 + 1 + 1 = 2
+T_4 = 1 + 1 + 2 = 4
+public class Tribonacci {
+
+    public static int tribonacci(int n) {
+        if (n == 0) return 0;
+        if (n == 1 || n == 2) return 1;
+
+        int[] dp = new int[n + 1];
+        dp[0] = 0;
+        dp[1] = 1;
+        dp[2] = 1;
+
+        for (int i = 3; i <= n; i++) {
+            dp[i] = dp[i - 1] + dp[i - 2] + dp[i - 3];
+        }
+
+        return dp[n];
+    }
+
+    public static void main(String[] args) {
+        int n = 4;
+        int tribonacciNumber = tribonacci(n);
+        System.out.println("Tribonacci number at index " + n + ": " + tribonacciNumber);
+    }
+}
+===================================================================================================================================================
+Q3. You are a professional robber planning to rob houses along a street. Each house has a certain
+amount of money stashed, the only constraint stopping you from robbing each of them is that
+adjacent houses have security systems connected and it will automatically contact the police if
+two adjacent houses were broken into on the same night.
+Given an integer array nums representing the amount of money of each house, return the
+maximum amount of money you can rob tonight without alerting the police.
+Example 1:
+ nums = [1,2,3,1]
+  4
+Explanation: Rob house 1 (money = 1) and then rob house 3 (money = 3).
+Total amount you can rob = 1 + 3 = 4.
+
+public class HouseRobber {
+    
+    public static int rob(int[] nums) {
+        int n = nums.length;
+        if (n == 0) return 0;
+        if (n == 1) return nums[0];
+        
+        int[] dp = new int[n + 1];
+        dp[0] = 0;
+        dp[1] = nums[0];
+        
+        for (int i = 1; i < n; i++) {
+            dp[i + 1] = Math.max(dp[i - 1] + nums[i], dp[i]);
+        }
+        
+        return dp[n];
+    }
+
+    public static void main(String[] args) {
+        int[] nums = {1, 2, 3, 1};
+        int maxAmount = rob(nums);
+        System.out.println("Maximum amount that can be robbed: " + maxAmount);
+    }
+}
+==================================================================================================================================================
+Q4. There is a robot on an m x n grid. The robot is initially located at the top-left corner (i.e.,
+grid[0][0]). The robot tries to move to the bottom-right corner (i.e., grid[m - 1][n - 1]). The robot
+can only move either down or right at any point in time.
+Given the two integers m and n, return the number of possible unique paths that the robot can
+take to reach the bottom-right corner.
+m = 3, n = 7
+28
+public class UniquePaths {
+    
+    public static int uniquePaths(int m, int n) {
+        int[][] dp = new int[m][n];
+        
+        // Initialize the first row and first column to 1
+        for (int i = 0; i < m; i++) {
+            dp[i][0] = 1;
+        }
+        for (int j = 0; j < n; j++) {
+            dp[0][j] = 1;
+        }
+        
+        // Calculate the number of unique paths for each cell
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                dp[i][j] = dp[i-1][j] + dp[i][j-1];
+            }
+        }
+        
+        return dp[m-1][n-1];
+    }
+
+    public static void main(String[] args) {
+        int m = 3;
+        int n = 7;
+        int uniquePathsCount = uniquePaths(m, n);
+        System.out.println("Number of unique paths: " + uniquePathsCount);
+    }
+}
+=================================================================================================================================================
+Q5. Given a triangle array, return the minimum path sum from top to bottom.For each step, you
+may move to an adjacent number of the row below. More formally, if you are on index i on the
+current row, you may move to either index i or index i + 1 on the next row.
+Example 1:
+triangle = [[2],[3,4],[6,5,7],[4,1,8,3]]
+11
+Explanation: The triangle looks like:
+2
+3 4
+6 5 7
+4 1 8 3
+The minimum path sum from top to bottom is 2 + 3 + 5 + 1 = 11 (underlined above).
+
+import java.util.List;
+
+public class MinimumPathSumTriangle {
+    
+    public static int minimumTotal(List<List<Integer>> triangle) {
+        int rows = triangle.size();
+        int[][] dp = new int[rows][rows];
+        
+        // Initialize the first row of dp
+        dp[0][0] = triangle.get(0).get(0);
+        
+        // Calculate the minimum path sum for each position in dp
+        for (int i = 1; i < rows; i++) {
+            List<Integer> currentRow = triangle.get(i);
+            int cols = currentRow.size();
+            
+            dp[i][0] = dp[i-1][0] + currentRow.get(0); // leftmost element
+            dp[i][cols-1] = dp[i-1][cols-2] + currentRow.get(cols-1); // rightmost element
+            
+            for (int j = 1; j < cols-1; j++) {
+                dp[i][j] = Math.min(dp[i-1][j-1], dp[i-1][j]) + currentRow.get(j);
+            }
+        }
+        
+        // Find the minimum path sum in the last row of dp
+        int minPathSum = dp[rows-1][0];
+        for (int j = 1; j < rows; j++) {
+            minPathSum = Math.min(minPathSum, dp[rows-1][j]);
+        }
+        
+        return minPathSum;
+    }
+
+    public static void main(String[] args) {
+        List<List<Integer>> triangle = List.of(
+            List.of(2),
+            List.of(3, 4),
+            List.of(6, 5, 7),
+            List.of(4, 1, 8, 3)
+        );
+        int minPathSum = minimumTotal(triangle);
+        System.out.println("Minimum path sum: " + minPathSum);
+    }
+}
+==================================================================================================================================================
+                                                               Dynammic Programming-2
+                                                                Assignment Questions
+
+Q1. You are given an m x n integer array grid. There is a robot initially located at the top-left corner (i.e.,
+grid[0][0]). The robot tries to move to the bottom-right corner (i.e., grid[m - 1][n - 1]). The robot can only
+move either down or right at any point in time.
+An obstacle and space are marked as 1 or 0 respectively in the grid. A path that the robot takes cannot
+include any square that is an obstacle.
+Return the number of possible unique paths that the robot can take to reach the bottom-right corner.
+Input:obstacleGrid = [[0,0,0],[0,1,0],[0,0,0]]
+Output:2
+Explanation: There is one obstacle in the middle of the 3x3 grid above.
+There are two ways to reach the bottom-right corner:
+1. Right -> Right -> Down -> Down
+2. Down -> Down -> Right -> Right
+
+public class UniquePathsWithObstacles {
+    
+    public static int uniquePathsWithObstacles(int[][] obstacleGrid) {
+        int m = obstacleGrid.length;
+        int n = obstacleGrid[0].length;
+        
+        int[][] dp = new int[m][n];
+        
+        // Initialize the first row and first column of dp
+        dp[0][0] = obstacleGrid[0][0] == 0 ? 1 : 0;
+        
+        // Initialize the first row
+        for (int j = 1; j < n; j++) {
+            if (obstacleGrid[0][j] == 0) {
+                dp[0][j] = dp[0][j - 1];
+            } else {
+                dp[0][j] = 0;
+            }
+        }
+        
+        // Initialize the first column
+        for (int i = 1; i < m; i++) {
+            if (obstacleGrid[i][0] == 0) {
+                dp[i][0] = dp[i - 1][0];
+            } else {
+                dp[i][0] = 0;
+            }
+        }
+        
+        // Calculate the number of unique paths for each cell
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                if (obstacleGrid[i][j] == 0) {
+                    dp[i][j] = dp[i - 1][j] + dp[i][j - 1];
+                } else {
+                    dp[i][j] = 0;
+                }
+            }
+        }
+        
+        return dp[m - 1][n - 1];
+    }
+
+    public static void main(String[] args) {
+        int[][] obstacleGrid = {
+            {0, 0, 0},
+            {0, 1, 0},
+            {0, 0, 0}
+        };
+        int uniquePathsCount = uniquePathsWithObstacles(obstacleGrid);
+        System.out.println("Number of possible unique paths: " + uniquePathsCount);
+    }
+}
+==================================================================================================================================================
+Q2. You are a professional robber planning to rob houses along a street. Each house has a certain amount of
+money stashed. All houses at this place are arranged in a circle. That means the first house is the neighbor of
+the last one. Meanwhile, adjacent houses have a security system connected, and it will automatically
+contact the police if two adjacent houses were broken into on the same night.
+Given an integer array nums representing the amount of money of each house, return the maximum
+amount of money you can rob tonight without alerting the police.
+Example 1:
+nums = [2,3,2]
+3
+Explanation: You cannot rob house 1 (money = 2) and then rob house 3 (money = 2), because they are
+adjacent houses.
+public class HouseRobberII {
+    
+    public static int rob(int[] nums) {
+        int n = nums.length;
+        
+        if (n == 1) {
+            return nums[0];
+        } else if (n == 2) {
+            return Math.max(nums[0], nums[1]);
+        }
+        
+        // Rob houses from 0 to n-2
+        int maxAmount1 = robLinear(nums, 0, n - 2);
+        
+        // Rob houses from 1 to n-1
+        int maxAmount2 = robLinear(nums, 1, n - 1);
+        
+        // Return the maximum amount from the two scenarios
+        return Math.max(maxAmount1, maxAmount2);
+    }
+    
+    private static int robLinear(int[] nums, int start, int end) {
+        int n = end - start + 1;
+        
+        if (n == 1) {
+            return nums[start];
+        } else if (n == 2) {
+            return Math.max(nums[start], nums[start + 1]);
+        }
+        
+        int[] dp = new int[n];
+        dp[0] = nums[start];
+        dp[1] = Math.max(nums[start], nums[start + 1]);
+        
+        for (int i = 2; i < n; i++) {
+            dp[i] = Math.max(dp[i - 1], dp[i - 2] + nums[start + i]);
+        }
+        
+        return dp[n - 1];
+    }
+
+    public static void main(String[] args) {
+        int[] nums = {2, 3, 2};
+        int maxAmount = rob(nums);
+        System.out.println("Maximum amount that can be robbed: " + maxAmount);
+    }
+}
+==================================================================================================================================================
+Q3. Given a m x n grid filled with non-negative numbers, find a path from top left to bottom right, which
+minimizes the sum of all numbers along its path.
+Note: You can only move either down or right at any point in time.
+intput=grid = [[1,3,1],[1,5,1],[4,2,1]]
+output=7
+public class MinimumPathSum {
+    
+    public static int minPathSum(int[][] grid) {
+        int m = grid.length;
+        int n = grid[0].length;
+        
+        int[][] dp = new int[m][n];
+        
+        // Initialize the first row
+        dp[0][0] = grid[0][0];
+        for (int j = 1; j < n; j++) {
+            dp[0][j] = dp[0][j - 1] + grid[0][j];
+        }
+        
+        // Initialize the first column
+        for (int i = 1; i < m; i++) {
+            dp[i][0] = dp[i - 1][0] + grid[i][0];
+        }
+        
+        // Calculate the minimum sum for each cell
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                dp[i][j] = Math.min(dp[i - 1][j], dp[i][j - 1]) + grid[i][j];
+            }
+        }
+        
+        return dp[m - 1][n - 1];
+    }
+
+    public static void main(String[] args) {
+        int[][] grid = {
+            {1, 3, 1},
+            {1, 5, 1},
+            {4, 2, 1}
+        };
+        int minSum = minPathSum(grid);
+        System.out.println("Minimum path sum: " + minSum);
+    }
+}
+=================================================================================================================================================
+Q4. Given an integer array nums, return true if you can partition the array into two subsets such that the sum
+of the elements in both subsets is equal or false otherwise.
+Example 1:
+nums = [1,5,11,5]
+true
+Explanation: The array can be partitioned as [1, 5, 5] and [11].
+public class PartitionEqualSubsetSum {
+    
+    public static boolean canPartition(int[] nums) {
+        int totalSum = 0;
+        for (int num : nums) {
+            totalSum += num;
+        }
+        
+        if (totalSum % 2 != 0) {
+            return false;
+        }
+        
+        int targetSum = totalSum / 2;
+        boolean[] dp = new boolean[targetSum + 1];
+        dp[0] = true;
+        
+        for (int num : nums) {
+            for (int j = targetSum; j >= num; j--) {
+                if (dp[j - num]) {
+                    dp[j] = true;
+                }
+            }
+        }
+        
+        return dp[targetSum];
+    }
+
+    public static void main(String[] args) {
+        int[] nums = {1, 5, 11, 5};
+        boolean canPartition = canPartition(nums);
+        System.out.println("Can partition the array: " + canPartition);
+    }
+}
+
+==================================================================================================================================================
+Q5.You are given an integer array of coins representing coins of different denominations and an integer
+amount representing a total amount of money.
+Return the number of combinations that make up that amount. If that amount of money cannot be made up
+by any combination of the coins, return 0.
+You may assume that you have an infinite number of each kind of coin.
+Example 1:
+amount = 5, coins = [1,2,5]
+4
+public class CoinChangeCombinations {
+    
+    public static int change(int amount, int[] coins) {
+        int[] dp = new int[amount + 1];
+        dp[0] = 1;
+        
+        for (int coin : coins) {
+            for (int i = coin; i <= amount; i++) {
+                dp[i] += dp[i - coin];
+            }
+        }
+        
+        return dp[amount];
+    }
+
+    public static void main(String[] args) {
+        int amount = 5;
+        int[] coins = {1, 2, 5};
+        int numCombinations = change(amount, coins);
+        System.out.println("Number of combinations: " + numCombinations);
+    }
+}
+=================================================================================================================================================
